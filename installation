@@ -1,0 +1,23 @@
+!#/bin/bash
+sudo apt update
+sudo wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.25.0/blackbox_exporter-0.25.0.linux-amd64.tar.gz
+tar -xvf blackbox_exporter-0.25.0.linux-amd64.tar.gz
+sudo groupadd --system blackbox
+sudo useradd -s /sbin/nologin --system -g blackbox blackbox
+sudo vi /etc/systemd/system/blackbox.service
+[Unit]
+Description=prometheus blackbox_exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=blackbox
+Group=blackbox
+ExecStart= /home/ubuntu/blackbox_exporter-0.25.0.linux-amd64/blackbox_exporter --config.file="/home/ubuntu/blackbox_exporter-0.25.0.linux-amd64/blackbox.yml"
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+sudo systemctl daemon-reload
+sudo systemctl start blackbox
+sudo systemctl enable blackbox
